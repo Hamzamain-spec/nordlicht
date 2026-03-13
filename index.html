@@ -331,4 +331,50 @@ async function loadPosts() {
       const isBig = i === 0;
       el.innerHTML = `<div class="hc-bg ${bgs[i % bgs.length]}"></div><div class="hc-overlay"></div>
         <div class="hc-content">
-          <div class="hc-num
+          <div class="hc-num">0${i+1}</div>
+          <div class="hc-cat ${catColors[i % catColors.length]}">${p.category || 'Allgemein'}</div>
+          <div class="hc-title ${isBig ? 'hc-title-lg' : 'hc-title-sm'}">${p.title}</div>
+          <div class="hc-meta"><strong>${p.author || 'Redaktion'}</strong> · ${new Date(p.date).toLocaleDateString('de-DE')}</div>
+        </div>`;
+    });
+    
+    // Posts list
+    const pl = document.getElementById('posts-list');
+    pl.innerHTML = '';
+    posts.forEach((p, i) => {
+      const date = new Date(p.date).toLocaleDateString('de-DE', {day:'numeric', month:'long', year:'numeric'});
+      const exc = p.content.replace(/<[^>]+>/g, '').substring(0, 105) + '...';
+      pl.innerHTML += `<div class="post-card" onclick="location.href='post.html?id=${p.id}'">
+        <div class="pc-img"><div class="pc-bg ${bgs[i % bgs.length]}"></div><div class="pc-tag">${p.category || 'Allgemein'}</div></div>
+        <div class="pc-body"><div>
+          <div class="pc-meta"><span class="pc-cat">${p.category || 'Allgemein'}</span><div class="pc-sep"></div><span class="pc-date">${date}</span></div>
+          <div class="pc-title">${p.title}</div><div class="pc-exc">${exc}</div>
+        </div>
+        <div class="pc-foot"><span class="pc-author">${p.author || 'Redaktion'}</span><a class="pc-read" href="post.html?id=${p.id}">LESEN →</a></div></div></div>`;
+    });
+    
+    // Sidebar recent
+    const sr = document.getElementById('sidebar-recent');
+    sr.innerHTML = '';
+    posts.slice(0, 5).forEach(p => {
+      sr.innerHTML += `<div class="wi" onclick="location.href='post.html?id=${p.id}'">
+        <div class="wi-cat">${p.category || 'Allgemein'}</div>
+        <a class="wi-title" href="post.html?id=${p.id}">${p.title}</a>
+        <div class="wi-meta">${p.author || 'Redaktion'} · ${new Date(p.date).toLocaleDateString('de-DE')}</div>
+      </div>`;
+    });
+    
+  } catch (e) {
+    console.error('Error loading posts:', e);
+    document.getElementById('hero-empty').style.display = 'block';
+  }
+}
+
+// Load posts on page load
+loadPosts();
+
+// Auto-refresh every 30 seconds
+setInterval(loadPosts, 30000);
+</script>
+</body>
+</html>
